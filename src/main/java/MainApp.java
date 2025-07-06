@@ -10,25 +10,27 @@ public class MainApp {
             public void configure() {
  
                 // 1. Receive order from E-commerce
-from("jetty:http://0.0.0.0:8080/order")
+                from("undertow:http://0.0.0.0:8080/order")
+                    .convertBodyTo(String.class)
                     .log("Order received: ${body}")
-                    .to("log:order-processing");
- 
+                    .setBody(simple("Order accepted"));
                 // 2. Inventory update
-from("jetty:http://0.0.0.0:8080/inventory")
+                from("undertow:http://0.0.0.0:8080/inventory")
+                    .convertBodyTo(String.class)
                     .log("Inventory update: ${body}")
-                    .to("log:inventory-system");
+                    .setBody(simple("Inventory updated"));
  
                 // 3. Order status
-from("jetty:http://0.0.0.0:8080/order-status")
+                from("undertow:http://0.0.0.0:8080/order-status")
+                    .convertBodyTo(String.class)
                     .log("Order status update: ${body}")
-                    .to("log:order-status");
+                    .setBody(simple("Order status updated"));
             }
         });
  
         context.start();
         System.out.println("EAI Middleware started...");
-        Thread.sleep(99999999);
+        Thread.sleep(Long.MAX_VALUE);
         context.stop();
     }
 }
